@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#FAF7EE"
+    android:padding="32dp">
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="TapyNote" android:textSize="28sp" android:textColor="#222222" />
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" android:gravity="center"
+        android:textColor="#666666" android:textSize="15sp"
+        android:text="Long-press your home screen → Widgets → TapyNote, and drag a note onto it.\n\nTap the note any time to edit. Add as many as you like." />
+    <Button android:id="@+id/add_widget" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_marginTop="24dp"
+        android:text="Add note to home screen" />
+</LinearLayout>
