@@ -4,6 +4,7 @@ Minimal sticky notes for Android (8.0+), in the app and on your home screen.
 
 - **App:** lists all notes. Tap **+** to add, tap a note to edit, long-press to delete.
 - **Home screen:** long-press home screen → Widgets → TapyNote → drag it out (creates a new note), or open a note in the app and tap **Pin to home**.
+- **Tabs:** each widget holds up to 6 notes as small coloured tabs along the top. Tap a tab to switch, tap **+** to add one, and use **Remove tab** in the editor to take one off (the note stays in the app).
 - **Colour:** pick one of the swatches in the editor; the widget updates too.
 - Edits save automatically when you close the editor. Removing a widget keeps the note in the app.
 

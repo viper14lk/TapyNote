@@ -44,20 +44,42 @@ object NoteStore {
 
     fun delete(ctx: Context, id: Long) {
         saveAll(ctx, all(ctx).filter { it.id != id })
-        widgetsFor(ctx, id).forEach { unbind(ctx, it) }
+        widgetsFor(ctx, id).forEach { w ->
+            val t = tabs(ctx, w)
+            val idx = t.ids.indexOf(id)
+            t.ids.removeAt(idx)
+            if (t.active >= idx && t.active > 0) t.active--
+            setTabs(ctx, w, t)
+        }
     }
 
-    // ---- widget <-> note mapping ----
-    fun noteForWidget(ctx: Context, widgetId: Int): Long =
-        prefs(ctx).getLong("w_$widgetId", -1)
+    // ---- widget -> tabs (up to 6 notes per widget) ----
+    const val MAX_TABS = 6
 
-    fun bind(ctx: Context, widgetId: Int, noteId: Long) =
-        prefs(ctx).edit().putLong("w_$widgetId", noteId).apply()
+    class Tabs(val ids: MutableList<Long>, var active: Int) {
+        val activeId get() = ids.getOrNull(active.coerceIn(0, (ids.size - 1).coerceAtLeast(0)))
+    }
+
+    fun tabs(ctx: Context, widgetId: Int): Tabs {
+        val raw = prefs(ctx).all["w_$widgetId"] ?: return Tabs(mutableListOf(), 0)
+        if (raw is Long) return Tabs(mutableListOf(raw), 0) // older single-note format
+        val (ids, active) = (raw as String).split("|")
+        val known = all(ctx).map { it.id }.toSet()
+        val list = ids.split(",").mapNotNull { it.toLongOrNull() }.filter { it in known }.toMutableList()
+        return Tabs(list, active.toIntOrNull() ?: 0)
+    }
+
+    fun setTabs(ctx: Context, widgetId: Int, t: Tabs) {
+        t.active = t.active.coerceIn(0, (t.ids.size - 1).coerceAtLeast(0))
+        prefs(ctx).edit().putString("w_$widgetId", t.ids.joinToString(",") + "|" + t.active).apply()
+    }
 
     fun unbind(ctx: Context, widgetId: Int) =
         prefs(ctx).edit().remove("w_$widgetId").apply()
 
+    private fun widgetIds(ctx: Context) =
+        prefs(ctx).all.keys.filter { it.startsWith("w_") }.map { it.removePrefix("w_").toInt() }
+
     fun widgetsFor(ctx: Context, noteId: Long): List<Int> =
-        prefs(ctx).all.filter { it.key.startsWith("w_") && it.value == noteId }
-            .map { it.key.removePrefix("w_").toInt() }
+        widgetIds(ctx).filter { noteId in tabs(ctx, it).ids }
 }
