@@ -19,7 +19,9 @@ class EditNoteActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        // Tall editor: most of the screen height (shrinks above the keyboard via adjustResize).
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.heightPixels * 0.75).toInt())
         window.setBackgroundDrawableResource(android.R.color.transparent)
 
         widgetId = intent.getIntExtra(NoteWidget.EXTRA_WIDGET_ID, -1)
@@ -75,7 +77,10 @@ class EditNoteActivity : Activity() {
         }
 
         findViewById<View>(R.id.done).setOnClickListener { finish() }
-        findViewById<View>(R.id.pin).setOnClickListener {
+        // Only offer "Pin to home" for notes that aren't already on the home screen.
+        val pin = findViewById<View>(R.id.pin)
+        if (widgetId != -1 || NoteStore.widgetsFor(this, n.id).isNotEmpty()) pin.visibility = View.GONE
+        pin.setOnClickListener {
             save()
             if (!NoteWidget.pin(this, n.id))
                 Toast.makeText(this, "Add it from your home screen's widget list", Toast.LENGTH_LONG).show()
